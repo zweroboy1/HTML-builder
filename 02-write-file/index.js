@@ -9,17 +9,18 @@ const BYE_MESSAGE = `Thank you! Your text is saved to file ${FILE_NAME}\n`;
 const file = path.join(__dirname, FILE_NAME);
 const stream = fs.createWriteStream(file);
 
+const handleExit = (message) => {
+  stdout.write(message);
+  process.exit();
+};
+
 stdout.write(WELCOME_MESSAGE);
 
 stdin.on('data', (data) => {
   if (data.toString().trim() === 'exit') {
-    stdout.write(BYE_MESSAGE);
-    process.exit();
+    handleExit(BYE_MESSAGE);
   }
   stream.write(data);
 });
 
-process.on('SIGINT', () => {
-  stdout.write(BYE_MESSAGE);
-  process.exit();
-});
+process.on('SIGINT', () => handleExit(BYE_MESSAGE));
