@@ -3,18 +3,13 @@ const path = require('path');
 const SOURCE_FOLDER = 'files';
 const NEW_FOLDER = 'files-copy';
 
-async function copyDir(sourceFolder, newFolder) {
-  const sourcePath = path.join(__dirname, sourceFolder);
-  const destPath = path.join(__dirname, newFolder);
-
-  try {
-    await fsPromises.access(destPath);
-  } catch (err) {
-    try {
-      await fsPromises.mkdir(destPath);
-    } catch (err) {
-      console.error('Error creating directory:', err);
-    }
+async function copyDir(sourcePath, destPath) {
+  try {    
+    await fsPromises.rm(destPath, { recursive: true, force: true});
+    await fsPromises.mkdir(destPath, { recursive: true });
+  } catch (error) {
+    console.error('Error creating directory:', error);
+    return;
   }
 
   const files = await fsPromises.readdir(sourcePath);
@@ -28,8 +23,11 @@ async function copyDir(sourceFolder, newFolder) {
     } else {
       const content = await fsPromises.readFile(sourceFile);
       await fsPromises.writeFile(destFile, content);
+      console.log(`${destFile} is copied`);
     }
   }
 }
 
-copyDir(SOURCE_FOLDER, NEW_FOLDER);
+const sourcePath = path.join(__dirname, SOURCE_FOLDER);
+const destPath = path.join(__dirname, NEW_FOLDER);
+copyDir(sourcePath, destPath);
